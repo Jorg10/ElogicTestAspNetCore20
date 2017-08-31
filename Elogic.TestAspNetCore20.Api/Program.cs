@@ -18,8 +18,10 @@ namespace Elogic.TestAspNetCore20.Api
         }
 
         public static IWebHost BuildWebHost(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
+            new WebHostBuilder()
+                .UseContentRoot(Directory.GetCurrentDirectory())
+                .UseKestrel()
                 .UseStartup<Startup>()
                 .Build();
-    }
+   }
 }
