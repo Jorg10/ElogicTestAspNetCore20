@@ -1,4 +1,5 @@
 ﻿using Nancy;
+using Nancy.Authentication.Basic;
 using Nancy.Bootstrapper;
 using Nancy.TinyIoc;
 using SimpleInjector;
@@ -19,6 +20,7 @@ namespace Elogic.TestAspNetCore20.Api
 
          // Register application components here, e.g.:
          container.Register<IHomeService, HomeService>();
+         container.Register<IUserValidator, UserValidator>();
 
          // Register Nancy modules.
          foreach (var nancyModule in this.Modules) container.Register(nancyModule.ModuleType);
@@ -33,6 +35,10 @@ namespace Elogic.TestAspNetCore20.Api
          nancy.Register(typeof(INancyModuleCatalog), new SimpleInjectorModuleCatalog(container));
          nancy.Register(typeof(INancyContextFactory), new SimpleInjectorScopedContextFactory(
              container, nancy.Resolve<INancyContextFactory>()));
+
+         pipelines.EnableBasicAuthentication(
+            new BasicAuthenticationConfiguration(
+               container.GetInstance<IUserValidator>(), "MyRealm"));
       }
    }
 }
