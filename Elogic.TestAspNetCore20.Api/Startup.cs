@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Nancy.Authentication.Stateless;
 using Nancy.Owin;
 
 namespace Elogic.TestAspNetCore20.Api
@@ -28,7 +30,9 @@ namespace Elogic.TestAspNetCore20.Api
             app.UseDeveloperExceptionPage();
          }
 
-         app.UseOwin(x => x.UseNancy(opt => opt.Bootstrapper = new Bootstrapper()));
+         app
+            .UseOwin(x =>
+               x.UseNancy(opt => opt.Bootstrapper = new Bootstrapper()));
       }
    }
 }

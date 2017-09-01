@@ -1,5 +1,6 @@
 ﻿using Nancy;
 using Nancy.Authentication.Basic;
+using Nancy.Authentication.Stateless;
 using Nancy.Bootstrapper;
 using Nancy.TinyIoc;
 using SimpleInjector;
@@ -20,7 +21,8 @@ namespace Elogic.TestAspNetCore20.Api
 
          // Register application components here, e.g.:
          container.Register<IHomeService, HomeService>();
-         container.Register<IUserValidator, UserValidator>();
+         container.RegisterSingleton<IAuthenticationService, AuthenticationService>();
+         //container.Register<IUserValidator, UserValidator>();
 
          // Register Nancy modules.
          foreach (var nancyModule in this.Modules) container.Register(nancyModule.ModuleType);
@@ -33,12 +35,23 @@ namespace Elogic.TestAspNetCore20.Api
 
          // Hook up Simple Injector in the Nancy pipeline.
          nancy.Register(typeof(INancyModuleCatalog), new SimpleInjectorModuleCatalog(container));
-         nancy.Register(typeof(INancyContextFactory), new SimpleInjectorScopedContextFactory(
-             container, nancy.Resolve<INancyContextFactory>()));
+         nancy.Register(typeof(INancyContextFactory), new SimpleInjectorScopedContextFactory(container, nancy.Resolve<INancyContextFactory>()));
 
-         pipelines.EnableBasicAuthentication(
-            new BasicAuthenticationConfiguration(
-               container.GetInstance<IUserValidator>(), "MyRealm"));
+         //pipelines.EnableBasicAuthentication(
+         //   new BasicAuthenticationConfiguration(
+         //      container.GetInstance<IUserValidator>(), "MyRealm"));
+
+         var configuration =
+                new StatelessAuthenticationConfiguration(ctx =>
+                {
+                   var authorizationHeader = ctx.Request.Headers.Authorization;
+
+                   var token = authorizationHeader?.Replace(string.Intern("token: "), string.Empty, StringComparison.InvariantCultureIgnoreCase);
+
+                   return container.GetInstance<IAuthenticationService>().GetUserFromToken(token);
+                });
+
+         StatelessAuthentication.Enable(pipelines, configuration);
       }
    }
 }
