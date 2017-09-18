@@ -85,7 +85,16 @@ namespace Elogic.TestAspNetCore20.Api
 
          validationParameters.IssuerSigningKey = GetSecurityKey();
 
-         var principal = handler.ValidateToken(token, validationParameters, out var validatedToken);
+         ClaimsPrincipal principal = default;
+
+         try
+         {
+            principal = handler.ValidateToken(token, validationParameters, out var validatedToken);
+         }
+         catch (Exception)
+         {
+
+         }
 
          return principal;
       }
