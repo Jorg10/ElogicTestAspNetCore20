@@ -46,7 +46,7 @@ namespace Elogic.TestAspNetCore20.Api
                 {
                    var authorizationHeader = ctx.Request.Headers.Authorization;
 
-                   var token = authorizationHeader?.Replace(string.Intern("token: "), string.Empty, StringComparison.InvariantCultureIgnoreCase);
+                   var token = authorizationHeader?.Replace(string.Intern("Bearer: "), string.Empty, StringComparison.InvariantCultureIgnoreCase);
 
                    return container.GetInstance<IAuthenticationService>().GetUserFromToken(token);
                 });
